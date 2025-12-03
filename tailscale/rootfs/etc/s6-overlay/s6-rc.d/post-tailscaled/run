@@ -127,6 +127,23 @@ done
 
 bashio::log.info "Tailscale is running"
 
+# Enable Tailscale SSH if configured
+if bashio::config.true "enable_ssh"; then
+  bashio::log.info "Enabling Tailscale SSH server..."
+  if ! /opt/tailscale set --ssh; then
+    bashio::log.warning "Failed to enable Tailscale SSH, but continuing..."
+  else
+    bashio::log.info "Tailscale SSH server enabled successfully"
+  fi
+elif bashio::config.false "enable_ssh"; then
+  bashio::log.info "Disabling Tailscale SSH server..."
+  if ! /opt/tailscale set --ssh=false; then
+    bashio::log.warning "Failed to disable Tailscale SSH, but continuing..."
+  else
+    bashio::log.info "Tailscale SSH server disabled"
+  fi
+fi
+
 # Linux optimizations for subnet routers and exit nodes
 # Based on: https://tailscale.com/kb/1320/performance-best-practices#linux-optimizations-for-subnet-routers-and-exit-nodes
 # Note: Changes made via ethtool are not persistent and will be lost after the machine shuts down

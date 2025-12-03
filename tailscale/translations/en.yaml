@@ -94,6 +94,14 @@ configuration:
       This option allows you to enable Taildrop, a file sharing service
       that allows you to share files with other Tailscale nodes.
       When not set, this option is enabled by default.
+  enable_ssh:
+    name: Enable Tailscale SSH
+    description: >-
+      This option enables Tailscale SSH server on your Home Assistant instance.
+      When enabled, Tailscale manages SSH authentication and authorization using
+      your tailnet's access control policies. You must also configure SSH access
+      rules in your Tailscale admin console's Access controls page.
+      When not set, this option is disabled by default.
   userspace_networking:
     name: Userspace networking mode
     description: >-

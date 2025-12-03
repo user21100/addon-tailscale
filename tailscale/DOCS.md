@@ -75,6 +75,7 @@ tags:
   - tag:example
   - tag:homeassistant
 taildrop: true
+enable_ssh: false
 userspace_networking: true
 ```
 
@@ -330,6 +331,59 @@ When not set, this option is enabled by default.
 
 Received files are stored in the `/share/taildrop` directory.
 
+### Option: `enable_ssh`
+
+This option allows you to enable [Tailscale SSH][tailscale_info_ssh] on your Home Assistant instance. When enabled, Tailscale manages SSH authentication and authorization using your tailnet's access control policies.
+
+When not set, this option is disabled by default.
+
+**Prerequisites:**
+
+1. **Configure SSH Access in Tailscale Admin Console:**
+   - Navigate to the [Access controls page][tailscale_acls] in your Tailscale admin console
+   - Ensure your tailnet policy file includes SSH access rules
+   - By default, the policy allows users to SSH into their own devices:
+     ```json
+     "ssh": [
+       {
+         "action": "check",
+         "src": ["autogroup:member"],
+         "dst": ["autogroup:self"],
+         "users": ["autogroup:nonroot", "root"]
+       }
+     ]
+     ```
+
+2. **Enable SSH in Add-on Configuration:**
+   - Set `enable_ssh: true` in the add-on configuration
+   - Restart the add-on
+
+**Usage:**
+
+After enabling, you can SSH into your Home Assistant instance from any device on your Tailscale network:
+
+```bash
+# Using the device hostname
+tailscale ssh homeassistant
+
+# Or using the Tailscale IP
+tailscale ssh 100.x.x.x
+
+# Or using regular SSH (if Tailscale SSH is enabled)
+ssh homeassistant
+```
+
+**Benefits:**
+
+- **Passwordless SSH**: Uses Tailscale's identity system for authentication
+- **Centralized Access Control**: Managed via Tailscale ACLs
+- **Secure**: All traffic encrypted via WireGuard
+- **No Port Forwarding**: Works without exposing SSH to the internet
+
+**Note:** Tailscale SSH must be enabled on the device itself (via this option) AND configured in your tailnet's access control policies. The add-on option enables SSH on the device, while the ACL policy controls who can access it.
+
+More information: [Tailscale SSH][tailscale_info_ssh]
+
 ### Option: `userspace_networking`
 
 The add-on uses [userspace networking mode][tailscale_info_userspace_networking]
@@ -463,4 +517,5 @@ SOFTWARE.
 [tailscale_info_subnets]: https://tailscale.com/kb/1019/subnets
 [tailscale_info_tags]: https://tailscale.com/kb/1068/tags
 [tailscale_info_taildrop]: https://tailscale.com/kb/1106/taildrop
+[tailscale_info_ssh]: https://tailscale.com/kb/1193/tailscale-ssh
 [tailscale_info_userspace_networking]: https://tailscale.com/kb/1112/userspace-networking
